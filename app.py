@@ -92,21 +92,29 @@ def convert_mp3_to_wav(mp3_path, wav_path):
 
 # Vishing prediction function
 def predict_vishing(audio_file):
-    temp_mp3 = "temp_audio.mp3"
-    temp_wav = "temp_audio.wav"
+    import os
+    from pydub import AudioSegment
 
-    # Determine file extension
+    # Install ffmpeg in deployment
+    os.system("apt-get update && apt-get install -y ffmpeg")
+
+    # Save uploaded audio
     file_extension = audio_file.name.split(".")[-1].lower()
+    temp_input = f"input_audio.{file_extension}"
+    with open(temp_input, "wb") as f:
+        f.write(audio_file.getbuffer())
 
-    # Save uploaded file
-    file_path = temp_mp3 if file_extension == "mp3" else temp_wav
-    with open(file_path, "wb") as f:
-        f.write(audio_file.getbuffer())  # Use getbuffer() to properly save file
-
-    # Convert MP3 to WAV if necessary
+    temp_output = "converted_audio.wav"
+    
+    # Convert to wav if needed
     if file_extension == "mp3":
-        convert_mp3_to_wav(temp_mp3, temp_wav)
-        os.remove(temp_mp3)  # Remove MP3 after conversion
+        convert_mp3_to_wav(temp_input, temp_output)
+        os.remove(temp_input)  # Clean up
+
+    elif file_extension == "wav":
+        temp_output = temp_input  # Already WAV
+
+    # Transcribe & predict...MP3 after conversion
 
     # Transcribe audio using Whisper
     result = whisper_model.transcribe(temp_wav)
