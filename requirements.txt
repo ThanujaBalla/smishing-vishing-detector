@@ -5,7 +5,7 @@ nltk
 openai-whisper
 pydub
 winsound
-whisper
 pydub
 torch
 torchaudio
+scikit-learn
