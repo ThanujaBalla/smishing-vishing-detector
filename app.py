@@ -11,7 +11,7 @@ import pygame
 from pydub import AudioSegment
 from pydub.playback import play
 import os
-
+os.system("apt-get update && apt-get install -y ffmpeg")
 # Download required NLTK data
 nltk.download('punkt_tab', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -95,12 +95,13 @@ def predict_vishing(audio_file):
     temp_mp3 = "temp_audio.mp3"
     temp_wav = "temp_audio.wav"
 
-    # Determine the correct file extension
+    # Determine file extension
     file_extension = audio_file.name.split(".")[-1].lower()
 
-    # Save the uploaded file
-    with open(temp_mp3 if file_extension == "mp3" else temp_wav, "wb") as f:
-        f.write(audio_file.read())
+    # Save uploaded file
+    file_path = temp_mp3 if file_extension == "mp3" else temp_wav
+    with open(file_path, "wb") as f:
+        f.write(audio_file.getbuffer())  # Use getbuffer() to properly save file
 
     # Convert MP3 to WAV if necessary
     if file_extension == "mp3":
@@ -117,10 +118,10 @@ def predict_vishing(audio_file):
     vectorized_text_dense = vectorized_text.toarray()
     prediction = vishing_model.predict(vectorized_text_dense)[0]
 
-    # Cleanup temporary files
+    # Cleanup
     os.remove(temp_wav)
 
-    return prediction, transcribed_text  # 1 = Vishing, 0 = Not Vishing
+    return prediction, transcribed_text#1 = Vishing, 0 = Not Vishing
 
 
 
