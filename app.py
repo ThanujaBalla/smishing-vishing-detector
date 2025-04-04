@@ -49,12 +49,21 @@ st.set_page_config(page_title="Smishing & Vishing Detector", page_icon="🔒")
 ALERT_SOUND_URL = "https://github.com/ThanujaBalla/smishing-vishing-detector/blob/main/alert.wav"
 def play_alert():
     audio_script = f"""
-        <audio id="alert-sound" autoplay>
-            <source src="{ALERT_SOUND_URL}" type="audio/wav">
-        </audio>
         <script>
-            var audio = document.getElementById("alert-sound");
-            audio.play();
+        function playSound() {{
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var source = audioCtx.createBufferSource();
+            fetch("{ALERT_SOUND_URL}")
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => {{
+                source.buffer = audioBuffer;
+                source.connect(audioCtx.destination);
+                source.start();
+            }})
+            .catch(error => console.error("Audio playback failed:", error));
+        }}
+        playSound();
         </script>
     """
     st.markdown(audio_script, unsafe_allow_html=True)
