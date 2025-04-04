@@ -7,11 +7,12 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import whisper
-import pygame
 from pydub import AudioSegment
-from pydub.playback import play
 import os
+
+# Install ffmpeg in deployment environment (do this once)
 os.system("apt-get update && apt-get install -y ffmpeg")
+
 # Download required NLTK data
 nltk.download('punkt_tab', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -43,10 +44,11 @@ try:
 except Exception as e:
     st.error(f"Failed to load Whisper model: {e}")
     st.stop()
-    
+
 st.set_page_config(page_title="Smishing & Vishing Detector", page_icon="🔒")
 
 ALERT_SOUND_URL = "https://github.com/ThanujaBalla/smishing-vishing-detector/blob/main/alert.wav"
+
 def play_alert():
     audio_script = f"""
         <script>
@@ -67,6 +69,7 @@ def play_alert():
         </script>
     """
     st.markdown(audio_script, unsafe_allow_html=True)
+
 # Preprocessing function for text
 def preprocess_text(text):
     text = text.lower()
@@ -85,39 +88,30 @@ def predict_smishing(text):
 
 # Convert MP3 to WAV
 def convert_mp3_to_wav(mp3_path, wav_path):
-    """Convert MP3 to WAV format using pydub."""
     audio = AudioSegment.from_mp3(mp3_path)
     audio.export(wav_path, format="wav")
-    return wav_path
 
 # Vishing prediction function
 def predict_vishing(audio_file):
-    import os
-    from pydub import AudioSegment
-
-    # Install ffmpeg in deployment
-    os.system("apt-get update && apt-get install -y ffmpeg")
-
-    # Save uploaded audio
     file_extension = audio_file.name.split(".")[-1].lower()
     temp_input = f"input_audio.{file_extension}"
+    temp_output = "converted_audio.wav"
+
+    # Save uploaded file properly
     with open(temp_input, "wb") as f:
         f.write(audio_file.getbuffer())
 
-    temp_output = "converted_audio.wav"
-    
-    # Convert to wav if needed
+    # Convert MP3 to WAV if needed
     if file_extension == "mp3":
         convert_mp3_to_wav(temp_input, temp_output)
-        os.remove(temp_input)  # Clean up
-
+        os.remove(temp_input)  # Cleanup input file
     elif file_extension == "wav":
-        temp_output = temp_input  # Already WAV
-
-    # Transcribe & predict...MP3 after conversion
+        temp_output = temp_input
+    else:
+        raise ValueError("Unsupported audio format")
 
     # Transcribe audio using Whisper
-    result = whisper_model.transcribe(temp_wav)
+    result = whisper_model.transcribe(temp_output)
     transcribed_text = result["text"]
 
     # Preprocess and predict
@@ -126,12 +120,11 @@ def predict_vishing(audio_file):
     vectorized_text_dense = vectorized_text.toarray()
     prediction = vishing_model.predict(vectorized_text_dense)[0]
 
-    # Cleanup
-    os.remove(temp_wav)
+    # Cleanup WAV file
+    if os.path.exists(temp_output):
+        os.remove(temp_output)
 
-    return prediction, transcribed_text#1 = Vishing, 0 = Not Vishing
-
-
+    return prediction, transcribed_text  # 1 = Vishing, 0 = Not Vishing
 
 # Streamlit UI
 st.title("🔒 AI-Driven Smishing & Vishing Detection")
@@ -155,7 +148,7 @@ if option == "Text (Smishing)":
                     try:
                         play_alert()
                     except:
-                        st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
+                        st.warning("Audio alert failed.")
                 else:
                     st.success("✅ **Safe Message.** No smishing detected.")
         else:
@@ -168,17 +161,20 @@ elif option == "Audio (Vishing)":
     if audio_file:
         if st.button("Analyze Audio", key="vishing_btn"):
             with st.spinner("Transcribing and analyzing audio..."):
-                prediction, transcribed_text = predict_vishing(audio_file)
-                st.markdown("**Transcribed Text:**")
-                st.write(transcribed_text)
-                if prediction == 1:
-                    st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
-                    try:
-                        play_alert()
-                    except:
-                        st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
-                else:
-                    st.success("✅ **Safe Audio.** No vishing detected.")
+                try:
+                    prediction, transcribed_text = predict_vishing(audio_file)
+                    st.markdown("**Transcribed Text:**")
+                    st.write(transcribed_text)
+                    if prediction == 1:
+                        st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
+                        try:
+                            play_alert()
+                        except:
+                            st.warning("Audio alert failed.")
+                    else:
+                        st.success("✅ **Safe Audio.** No vishing detected.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
     else:
         st.warning("Please upload an audio file to analyze.")
 
