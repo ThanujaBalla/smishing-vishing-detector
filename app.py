@@ -123,6 +123,7 @@ if option == "Text (Smishing)":
                 if prediction == 1:
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
+                        st.audio("alert.wav")
                         sound=AudioSegment.from_wav("alert.wav")
                         play(sound)
                     except:
