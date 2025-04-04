@@ -123,6 +123,9 @@ if option == "Text (Smishing)":
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
                         pygame.mixer.init()
+                    except:
+                        st.warning("init error")
+                    try:
                         pygame.mixer.Sound("alert.wav").play()  # Replace with your sound file
                         #pygame.mixer.music.play()
                     except:
