@@ -4,7 +4,6 @@ numpy
 nltk
 openai-whisper
 pydub
-winsound
 pydub
 torch
 torchaudio
