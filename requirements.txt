@@ -10,3 +10,4 @@ flask
 beautifulsoup4
 requests
 nltk
+openai-whisper
