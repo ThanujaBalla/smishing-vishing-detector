@@ -9,6 +9,7 @@ from nltk.stem import WordNetLemmatizer
 import whisper
 import pygame
 from pydub import AudioSegment
+from pydub.playpack import play
 import os
 
 # Download required NLTK data
@@ -122,12 +123,8 @@ if option == "Text (Smishing)":
                 if prediction == 1:
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
-                        pygame.mixer.init()
-                    except:
-                        st.warning("init error")
-                    try:
-                        pygame.mixer.Sound("alert.wav").play()  # Replace with your sound file
-                        #pygame.mixer.music.play()
+                        sound=AudioSegment.from_wav("alert.wav")
+                        play(sound)
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
@@ -148,9 +145,8 @@ elif option == "Audio (Vishing)":
                 if prediction == 1:
                     st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
                     try:
-                        pygame.mixer.init()
-                        pygame.mixer.Sound("alert.wav").play()  # Replace with your sound file
-                        #pygame.mixer.music.play()
+                        sound=AudioSegment.from_wav("alert.wav")
+                        play(sound)
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
