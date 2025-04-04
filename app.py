@@ -95,15 +95,17 @@ def predict_vishing(audio_file):
     temp_mp3 = "temp_audio.mp3"
     temp_wav = "temp_audio.wav"
 
-    # Save uploaded file
-    with open(temp_mp3, "wb") as f:
+    # Determine the correct file extension
+    file_extension = audio_file.name.split(".")[-1].lower()
+
+    # Save the uploaded file
+    with open(temp_mp3 if file_extension == "mp3" else temp_wav, "wb") as f:
         f.write(audio_file.read())
 
     # Convert MP3 to WAV if necessary
-    if audio_file.name.endswith('.mp3'):
+    if file_extension == "mp3":
         convert_mp3_to_wav(temp_mp3, temp_wav)
-    else:
-        os.rename(temp_mp3, temp_wav)  # If it's already WAV, rename the file
+        os.remove(temp_mp3)  # Remove MP3 after conversion
 
     # Transcribe audio using Whisper
     result = whisper_model.transcribe(temp_wav)
@@ -117,10 +119,9 @@ def predict_vishing(audio_file):
 
     # Cleanup temporary files
     os.remove(temp_wav)
-    if os.path.exists(temp_mp3):
-        os.remove(temp_mp3)
 
     return prediction, transcribed_text  # 1 = Vishing, 0 = Not Vishing
+
 
 
 # Streamlit UI
