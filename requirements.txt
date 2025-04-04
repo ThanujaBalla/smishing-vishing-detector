@@ -1,0 +1,11 @@
+streamlit
+joblib
+numpy
+nltk
+openai-whisper
+pydub
+winsound
+whisper
+pydub
+torch
+torchaudio
