@@ -46,7 +46,18 @@ except Exception as e:
     
 st.set_page_config(page_title="Smishing & Vishing Detector", page_icon="🔒")
 
-
+ALERT_SOUND_URL = "https://github.com/ThanujaBalla/smishing-vishing-detector/blob/main/alert.wav"
+def play_alert():
+    audio_script = f"""
+        <audio id="alert-sound" autoplay>
+            <source src="{ALERT_SOUND_URL}" type="audio/wav">
+        </audio>
+        <script>
+            var audio = document.getElementById("alert-sound");
+            audio.play();
+        </script>
+    """
+    st.markdown(audio_script, unsafe_allow_html=True)
 # Preprocessing function for text
 def preprocess_text(text):
     text = text.lower()
@@ -123,9 +134,7 @@ if option == "Text (Smishing)":
                 if prediction == 1:
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
-                        st.audio("alert.wav")
-                        sound=AudioSegment.from_wav("alert.wav")
-                        play(sound)
+                        play_alert()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
@@ -146,8 +155,7 @@ elif option == "Audio (Vishing)":
                 if prediction == 1:
                     st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
                     try:
-                        sound=AudioSegment.from_wav("alert.wav")
-                        play(sound)
+                        play_alert()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
