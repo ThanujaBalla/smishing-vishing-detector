@@ -9,7 +9,7 @@ from nltk.stem import WordNetLemmatizer
 import whisper
 import pygame
 from pydub import AudioSegment
-from pydub.playpack import play
+from pydub.playback import play
 import os
 
 # Download required NLTK data
