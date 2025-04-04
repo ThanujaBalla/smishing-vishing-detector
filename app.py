@@ -123,8 +123,8 @@ if option == "Text (Smishing)":
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
                         pygame.mixer.init()
-                        pygame.mixer.music.load("alert.wav")  # Replace with your sound file
-                        pygame.mixer.music.play()
+                        pygame.mixer.Sound("alert.wav").play()  # Replace with your sound file
+                        #pygame.mixer.music.play()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
@@ -146,8 +146,8 @@ elif option == "Audio (Vishing)":
                     st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
                     try:
                         pygame.mixer.init()
-                        pygame.mixer.music.load("alert.wav")  # Replace with your sound file
-                        pygame.mixer.music.play()
+                        pygame.mixer.Sound("alert.wav").play()  # Replace with your sound file
+                        #pygame.mixer.music.play()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
