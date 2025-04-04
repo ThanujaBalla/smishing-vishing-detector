@@ -7,7 +7,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import whisper
-import winsound
+import pygame
 from pydub import AudioSegment
 import os
 
@@ -122,7 +122,9 @@ if option == "Text (Smishing)":
                 if prediction == 1:
                     st.error("⚠️ **Smishing Detected!** This message may be a scam.")
                     try:
-                        winsound.PlaySound("alert.wav", winsound.SND_FILENAME)
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("alert.wav")  # Replace with your sound file
+                        pygame.mixer.music.play()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
@@ -143,7 +145,9 @@ elif option == "Audio (Vishing)":
                 if prediction == 1:
                     st.error("⚠️ **Vishing Detected!** This audio may be a scam.")
                     try:
-                        winsound.PlaySound("alert.wav", winsound.SND_FILENAME)
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("alert.wav")  # Replace with your sound file
+                        pygame.mixer.music.play()
                     except:
                         st.warning("Audio alert failed. Ensure 'alert.wav' is in the directory.")
                 else:
